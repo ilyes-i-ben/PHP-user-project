@@ -23,4 +23,9 @@ class SQL
         return $queryPrepared->fetch();
     }
 
+    public function getDatabase(): \PDO
+    {
+        return $this->pdo;
+    } 
+    
 }

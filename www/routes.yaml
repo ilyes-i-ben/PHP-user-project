@@ -1,0 +1,29 @@
+/:
+  controller: Main
+  action: home
+  methods: [GET]
+
+/page:
+  controller: Page
+  action: show
+  methods: [GET]
+
+/register:
+  controller: UserController
+  action: register
+  methods: [GET, POST]
+
+/login:
+  controller: UserController
+  action: login
+  methods: [GET, POST]
+
+/logout:
+  controller: UserController
+  action: logout
+  methods: [GET]
+
+/dashboard:
+  controller: Backoffice
+  action: dashboard
+  methods: [GET]
