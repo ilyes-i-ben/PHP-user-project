@@ -9,6 +9,10 @@ class User extends Model
     private $username;
     private $email;
     private $password;
+    private $firstname;
+    private $lastname;
+    private $country;
+
 
     public function __construct()
     {
@@ -17,8 +21,8 @@ class User extends Model
 
     public function save(): bool
     {
-        $stmt = $this->db->prepare(query: "INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        return $stmt->execute([$this->username, $this->email, $this->password]);
+        $stmt = $this->db->prepare("INSERT INTO users (username, email, password, firstname, lastname, country) VALUES (?, ?, ?, ?, ?, ?)");
+        return $stmt->execute([$this->username, $this->email, $this->password, $this->firstname, $this->lastname, $this->country]);
     }
 
     public function findByEmail($email): array
@@ -51,6 +55,21 @@ class User extends Model
         return $this->password;
     }
 
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
+
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
     public function setUsername($username)
     {
         $this->username = $username;
@@ -65,5 +84,22 @@ class User extends Model
     {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $this->password = $hashedPassword;
+
+
+    }
+
+    public function setFirstname($firstname)
+    {
+        $this->firstname = $firstname;
+    }
+
+    public function setLastname($lastname)
+    {
+        $this->lastname = $lastname;
+    }
+
+    public function setCountry($country)
+    {
+        $this->country = $country;
     }
 }
