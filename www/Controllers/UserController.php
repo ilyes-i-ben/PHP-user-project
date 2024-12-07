@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Models\User;
+use App\Core\SQL;
+
 
 class UserController
 {
@@ -12,6 +14,8 @@ class UserController
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+        $this->db = new SQL();
+
     }
 
     public function register(): void
@@ -45,11 +49,10 @@ class UserController
             }
 
             if (empty($errors)) {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
                 $user->setUsername($username);
                 $user->setEmail($email);
-                $user->setPassword($hashedPassword);
+                $user->setPassword($password);
                 $user->setFirstname($firstname);
                 $user->setLastname($lastname);
                 $user->setCountry($country);
@@ -74,6 +77,7 @@ class UserController
             $email = $_POST['email'];
             $password = $_POST['password'];
 
+
             $errors = [];
 
             if (empty($email) || empty($password)) {
@@ -84,7 +88,7 @@ class UserController
                 $user = new User();
                 $userData = $user->findByEmail($email);
 
-                if ($userData && password_verify($password, $userData['password'])) {
+                if ($userData && isset($userData['password']) && password_verify($password, $userData['password'])) {
                     $_SESSION['user_id'] = $userData['id'];
                     $_SESSION['username'] = $userData['username'];
 

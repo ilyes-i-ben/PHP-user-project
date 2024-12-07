@@ -6,7 +6,7 @@
         <label for="password">Mot de passe:</label>
         <input type="password" id="password" name="password" required>
         <label for="passwordConfirm">Confirmer le mot de passe :</label>
-        <input type="password" id="pwdConfirm" name="pwdConfirm" required>
+        <input type="password" id="passwordConfirm" name="passwordConfirm" required>
         <label for="firstname">Prénom :</label>
         <input type="text" id="firstname" name="firstname" required>
         <label for="lastname">Nom :</label>
