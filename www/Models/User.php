@@ -23,7 +23,7 @@ class User extends Model
     {
         $stmt = $this->db->prepare("INSERT INTO users (username, email, password, firstname, lastname, country) VALUES (?, ?, ?, ?, ?, ?)");
         return $stmt->execute([$this->username, $this->email, $this->password, $this->firstname, $this->lastname, $this->country]);
-        }
+    }
     public function findByEmail($email): array
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");

@@ -85,14 +85,15 @@ class UserController
             }
 
             if (empty($errors)) {
-                $user = new User();
-                $userData = $user->findByEmail($email);
-
+                /**
+                 * @var array
+                 */
+                $userData = (new User())->findByEmail($email);
                 if ($userData && isset($userData['password']) && password_verify($password, $userData['password'])) {
                     $_SESSION['user_id'] = $userData['id'];
                     $_SESSION['username'] = $userData['username'];
 
-                    header('Location: /home');
+                    header('Location: /');
                     exit();
                 } else {
                     $errors[] = "Identifiants incorrects.";
