@@ -38,13 +38,12 @@ class UserController
                 ->email('email', $email)
                 ->unique('email', $email, fn($value) => $user->findByEmail($value) !== null)
                 ->required('password', $password)
-                ->strongPassword('password', $password)
                 ->required('passwordConfirm', $passwordConfirm)
-                ->match('password', $password, 'passwordConfirm', $passwordConfirm)
+                ->matchPassword($password, $passwordConfirm)
                 ->required('firstname', $firstname)
-                ->alpha('firstname', $firstname)
+                ->validName($firstname)
                 ->required('lastname', $lastname)
-                ->alpha('lastname', $lastname)
+                ->validName($lastname)
                 ->required('country', $country);
 
             if ($validator->passes()) {
@@ -61,7 +60,7 @@ class UserController
             } else {
                 $errors = $validator->getErrors();
                 $view = new View("Auth/register.php");
-                $view->addData('errors', $errors);  
+                $view->addData('errors', $errors);
             }
         } else {
             $view = new View("Auth/register.php");
@@ -73,17 +72,17 @@ class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $validator = new Validator();
-    
+
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
-    
+
             $user = new User();
-    
+
             $validator
                 ->required('email', $email)
                 ->email('email', $email)
                 ->required('password', $password);
-    
+
             if ($validator->passes()) {
                 $userData = $user->findByEmail($email);
                 if ($userData) {
@@ -91,7 +90,7 @@ class UserController
                     if (isset($userData['password']) && password_verify($password, $userData['password'])) {
                         $_SESSION['user_id'] = $userData['id'];
                         $_SESSION['username'] = $userData['username'];
-    
+
                         header('Location: /');
                         exit();
                     } else {
@@ -109,7 +108,7 @@ class UserController
             $view = new View("Auth/login.php");
         }
     }
-    
+
 
     public function logout(): void
     {
