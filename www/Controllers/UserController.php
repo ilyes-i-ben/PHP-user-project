@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Models\User;
 use App\Core\SQL;
-
+use App\Core\Validator;
 
 class UserController
 {
@@ -15,41 +15,38 @@ class UserController
             session_start();
         }
         $this->db = new SQL();
-
     }
 
     public function register(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            $passwordConfirm = $_POST['passwordConfirm'];
-            $firstname = $_POST['firstname'];
-            $lastname = $_POST['lastname'];
-            $country = $_POST['country'];
+            $validator = new Validator();
 
-            $errors = [];
-
-            if ($password !== $passwordConfirm) {
-                $errors[] = "Les mots de passe ne correspondent pas.";
-            }
-
-            if (empty($username) || empty($email) || empty($password) || empty($firstname) || empty($lastname) || empty($country)) {
-                $errors[] = "Tous les champs sont requis.";
-            }
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = "L'email n'est pas valide.";
-            }
+            $username = $_POST['username'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $passwordConfirm = $_POST['passwordConfirm'] ?? '';
+            $firstname = $_POST['firstname'] ?? '';
+            $lastname = $_POST['lastname'] ?? '';
+            $country = $_POST['country'] ?? '';
 
             $user = new User();
-            if ($user->findByEmail($email)) {
-                $errors[] = "L'email est déjà utilisé.";
-            }
 
-            if (empty($errors)) {
+            $validator
+                ->required('username', $username)
+                ->required('email', $email)
+                ->email('email', $email)
+                ->unique('email', $email, fn($value) => $user->findByEmail($value) !== null)
+                ->required('password', $password)
+                ->required('passwordConfirm', $passwordConfirm)
+                ->matchPassword($password, $passwordConfirm)
+                ->required('firstname', $firstname)
+                ->validName($firstname)
+                ->required('lastname', $lastname)
+                ->validName($lastname)
+                ->required('country', $country);
 
+            if ($validator->passes()) {
                 $user->setUsername($username);
                 $user->setEmail($email);
                 $user->setPassword($password);
@@ -61,9 +58,9 @@ class UserController
                 header('Location: /login');
                 exit();
             } else {
-                foreach ($errors as $error) {
-                    echo "<p>$error</p>";
-                }
+                $errors = $validator->getErrors();
+                $view = new View("Auth/register.php");
+                $view->addData('errors', $errors);
             }
         } else {
             $view = new View("Auth/register.php");
@@ -74,34 +71,39 @@ class UserController
     public function login(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+            $validator = new Validator();
 
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-            $errors = [];
+            $user = new User();
 
-            if (empty($email) || empty($password)) {
-                $errors[] = "Veuillez remplir tous les champs.";
-            }
+            $validator
+                ->required('email', $email)
+                ->email('email', $email)
+                ->required('password', $password);
 
-            if (empty($errors)) {
-                /**
-                 * @var array
-                 */
-                $userData = (new User())->findByEmail($email);
-                if ($userData && isset($userData['password']) && password_verify($password, $userData['password'])) {
-                    $_SESSION['user_id'] = $userData['id'];
-                    $_SESSION['username'] = $userData['username'];
+            if ($validator->passes()) {
+                $userData = $user->findByEmail($email);
+                if ($userData) {
 
-                    header('Location: /');
-                    exit();
+                    if (isset($userData['password']) && password_verify($password, $userData['password'])) {
+                        $_SESSION['user_id'] = $userData['id'];
+                        $_SESSION['username'] = $userData['username'];
+
+                        header('Location: /');
+                        exit();
+                    } else {
+                        $errors['password'][] = "Identifiants incorrects.";
+                    }
                 } else {
-                    $errors[] = "Identifiants incorrects.";
+                    $errors['email'][] = "Aucun utilisateur trouvé avec cet e-mail.";
                 }
+            } else {
+                $errors = $validator->getErrors();
             }
-            foreach ($errors as $error) {
-                echo "<p>$error</p>";  // Afficher les erreurs
-            }
+            $view = new View("Auth/login.php");
+            $view->addData('errors', $errors);
         } else {
             $view = new View("Auth/login.php");
         }
@@ -114,4 +116,3 @@ class UserController
         header('Location: /login');
     }
 }
-
