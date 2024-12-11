@@ -1,3 +1,5 @@
+<h1>Register</h1>
+
 <form action="/register" method="POST">
         <label for="username">Nom d'utilisateur:</label>
         <input type="text" id="username" name="username" required>

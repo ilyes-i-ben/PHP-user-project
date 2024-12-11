@@ -6,6 +6,9 @@
 </head>
 
 <body>
+
+    <h1> Login
+    </h1>
     <form action="/login" method="POST">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
@@ -16,3 +19,4 @@
 </body>
 
 </html>
+

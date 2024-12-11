@@ -3,9 +3,9 @@
   action: home
   methods: [GET]
 
-/page:
-  controller: Page
-  action: show
+/home:
+  controller: Main
+  action: home
   methods: [GET]
 
 /register:

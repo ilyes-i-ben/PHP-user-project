@@ -20,7 +20,6 @@
         </ul>
     </nav>
 </header>
-    <h1>Titre du front</h1>
     <?php include "../Views/".$this->v; ?>
 </body>
 </html>
